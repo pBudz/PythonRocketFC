@@ -11,8 +11,7 @@ import matplotlib.pyplot as plt2
 import matplotlib.pyplot as plt3
 import matplotlib.pyplot as plt4
 import matplotlib.pyplot as plt5
-count = 0
-file = "T.txt"
+file = "droneflight1.txt"
 
 with open (file) as json_file:
     atmodata = json.load(json_file)
@@ -21,29 +20,18 @@ with open (file) as json_file:
         templist.append(each)
     pressurelist = templist[::4]
     tempFlist = templist[1::4]
-    ALTlist = templist[2::4]
-    timeMlist = templist[3::4]    
+    humidList = templist[2::4]
+    ALTlist = templist[3::4]    
     templist = list()
     for each in atmodata['orient']:
         templist.append(each)
-    orientx = templist[::4]
-    orienty = templist[1::4]
-    orientz = templist[2::4]
-    timeMlist = templist[3::4]  
+    orientx = templist[::3]
+    orienty = templist[1::3]
+    orientz = templist[2::3]  
     templist = list()
     for each in atmodata['magnet']:
         templist.append(each)
-    magnetx = templist[::4]
-    magnety = templist[1::4]
-    magnetz = templist[2::4]
-    timeMlist = templist[3::4]  
-    templist = list()
-    for each in atmodata['linear']:
-        templist.append(each)
-    linearx = templist[::4]
-    lineary = templist[1::4]
-    linearz = templist[2::4]
-    timeMlist = templist[3::4]  
+    heading = templist
     templist = list()
     for each in atmodata['accel2']:
         templist.append(each)
@@ -52,7 +40,7 @@ with open (file) as json_file:
     gz = templist[2::4]
     timeMlist = templist[3::4] 
     templist = list()
-
+    
 def getAverage(data):
     return sum(data)  / len(data)
     
@@ -60,7 +48,9 @@ def getAverage(data):
 xarray1 = []
 npaltarray = []
 
-
+#for x in range(len(ALTlist)):
+#    if ALTlist[x] < -200:
+#        ALTlist[x] = 0
 for each in range(len(ALTlist)):
     xarray1.append(float(ALTlist[each]))
 for each in range(len(ALTlist)):
@@ -85,51 +75,94 @@ for number in gz:
 gz = nums    
 nums = []
 
-
-slope = 0
-
+y =  timeMlist[-1]
 npaltarray = np.array(ALTlist)
 xarray1 = np.array(timeMlist)
 slope, intercept = np.polyfit(npaltarray, xarray1, 1)
-xvar = np.linspace(0,110000,len(xarray1))
+xvar = np.linspace(0,y,len(xarray1))
 model_params1 = np.polyfit( xarray1, npaltarray, 20)
 y_predicted1 = np.polyval( model_params1, xvar )
 
 
 
+def getMaxG(accel):
+    maax = 0.0
+    temp = 0.0
+    for x in range(len(accel)):
+    
+        if accel[x] > maax:
+            temp = accel[x]
+        maax = temp
+    return maax
+    
+def getApogee(alt):
+    mx = 0.0
+    temp = 0.0
+    for x in range(len(alt)):
+    
+        if alt[x] > mx:
+            temp = alt[x]
+        mx = temp
+    return mx
+def getAvgHumidity(humarr):
+    divider = len(humarr)
+    total = 0.0
+    for x in range(len(humarr)):
+        total += humarr[x]
+        
+    return total/divider    
+        
+def getTempF(temparr):
+    mx = 0.0
+    temp = temparr[0]
+    mn = 0.0
+    
+    for x in range(len(temparr)):
+    
+        if temparr[x] < mn:
+            temp = temparr[x]
+        mn = temp
+    
+    
+    for x in range(len(temparr)):
+    
+        if temparr[x] > mx:
+            temp = temparr[x]
+        mx = temp
+    return mx,"max temp", mn, "min temp"
+    
 
+
+
+print(getMaxG(gz),"G")
+print(getApogee(ALTlist), "feet")
+print(getAvgHumidity(humidList), "% Average Humidity")
+print(getTempF(tempFlist))
 yavg = getAverage(ALTlist)
 
-plt.plot(timeMlist,gx)
-plt.plot(timeMlist,gy)
-plt.plot(timeMlist,gz)
+plt.plot(timeMlist,gx, c='blue',alpha = .8)
+plt.plot(timeMlist,gy, c= 'brown',alpha = .8)
+plt.plot(timeMlist,gz, c= 'red',alpha = .8)
 plt.xlabel("Time in Milliseconds")
-plt.ylabel("Gx")
+plt.ylabel("G")
 plt.show()
 #
 
-plt2.plot(timeMlist,pressurelist)
-#plt2.plot(timeMlist,linearx)
-#plt2.plot(timeMlist,lineary)
-#plt2.plot(timeMlist,linearz)
-#plt2.xlabel("Time in Milliseconds")
-#plt2.ylabel("linearG")
+plt2.plot(timeMlist,heading)
+plt2.xlabel("Time in Milliseconds")
+plt2.ylabel("Heading")
 plt2.show()
 #
-#plt3.plot(timeMlist,magnetx)
-##plt3.plot(timeMlist,magnety)
-##plt3.plot(timeMlist,magnetz)
-#plt3.xlabel("Time in Milliseconds")
-#plt3.ylabel("magnetx")
-##plt3.show()
+plt3.plot(timeMlist,pressurelist)
+plt3.plot(timeMlist,tempFlist)
+plt3.plot(timeMlist,humidList)
+plt3.xlabel("Time in Milliseconds")
+plt3.ylabel("atmo")
+plt3.show()
 
 
 plt4.scatter(xarray1,npaltarray,c='red',alpha = .2)
 plt4.plot(xvar, y_predicted1, c="black")
-#plt4.plot(xarray1,slope*xarray1+intercept)
-#plt4.plot(timeMlist,ALTlist)
-#plt4.plot(timeMlist,magnety)
-#plt4.plot(timeMlist,magnetz)
 plt4.title("Altitude over Time")
 plt4.xlabel("Time in Milliseconds")
 plt4.ylabel("Altitude")
