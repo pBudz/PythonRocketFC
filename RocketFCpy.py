@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt2
 import matplotlib.pyplot as plt3
 import matplotlib.pyplot as plt4
 import matplotlib.pyplot as plt5
-file = "droneflight1.txt"
+file = "rocketlaunch.txt"
 
 with open (file) as json_file:
     atmodata = json.load(json_file)
@@ -41,10 +41,6 @@ with open (file) as json_file:
     timeMlist = templist[3::4] 
     templist = list()
     
-def getAverage(data):
-    return sum(data)  / len(data)
-    
-
 xarray1 = []
 npaltarray = []
 
@@ -75,16 +71,19 @@ for number in gz:
 gz = nums    
 nums = []
 
-y =  timeMlist[-1]
-npaltarray = np.array(ALTlist)
-xarray1 = np.array(timeMlist)
-slope, intercept = np.polyfit(npaltarray, xarray1, 1)
-xvar = np.linspace(0,y,len(xarray1))
-model_params1 = np.polyfit( xarray1, npaltarray, 20)
-y_predicted1 = np.polyval( model_params1, xvar )
+
+def removeDataPost(arr, rem):
+    arr = arr[:rem]
+   # print(len(arr))
+    return arr
+
+def removeDataPre(arr, rem):
+    arr = arr[rem:]
+    return arr
 
 
 
+    
 def getMaxG(accel):
     maax = 0.0
     temp = 0.0
@@ -134,15 +133,47 @@ def getTempF(temparr):
 
 
 
-print(getMaxG(gz),"G")
+
+
+
+
+time1000 = removeDataPost(timeMlist,700)
+time1000 = removeDataPre(time1000, 550)
+gx1000 = removeDataPost(gx, 700)
+gx1000 = removeDataPre(gx1000, 550)
+gy1000 = removeDataPost(gy, 700)
+gy1000 = removeDataPre(gy1000, 550)
+gz1000 = removeDataPost(gz, 700)
+gz1000 = removeDataPre(gz1000, 550)
+
+Alt1000 = removeDataPost(ALTlist, 700)
+Alt1000 = removeDataPre(Alt1000, 550)
+
+#y =  time1000[-1]
+#npaltarray = np.array(ALTlist)
+#xarray1 = np.array(time1000)
+#slope, intercept = np.polyfit(npaltarray, xarray1, 1)
+#xvar = np.linspace(0,y,len(xarray1))
+#model_params1 = np.polyfit( xarray1, npaltarray, 5)
+#y_predicted1 = np.polyval( model_params1, xvar )
+#
+#
+#
+
+
+print(getMaxG(gz),"Gz")
+print(getMaxG(gx),"Gx")
+print(getMaxG(gy),"Gy")
 print(getApogee(ALTlist), "feet")
 print(getAvgHumidity(humidList), "% Average Humidity")
 print(getTempF(tempFlist))
-yavg = getAverage(ALTlist)
 
-plt.plot(timeMlist,gx, c='blue',alpha = .8)
-plt.plot(timeMlist,gy, c= 'brown',alpha = .8)
-plt.plot(timeMlist,gz, c= 'red',alpha = .8)
+plt.scatter(time1000,gx1000, c='blue',alpha = .8)
+plt.plot(time1000,gx1000, c='blue',alpha = .8)
+plt.plot(time1000,gy1000, c='red',alpha = .8)
+plt.plot(time1000,gz1000, c='green',alpha = .8)
+#plt.plot(timeMlist,gy, c= 'brown',alpha = .8)
+#plt.plot(timeMlist,gz, c= 'red',alpha = .8)
 plt.xlabel("Time in Milliseconds")
 plt.ylabel("G")
 plt.show()
@@ -153,27 +184,27 @@ plt2.xlabel("Time in Milliseconds")
 plt2.ylabel("Heading")
 plt2.show()
 #
-plt3.plot(timeMlist,pressurelist)
-plt3.plot(timeMlist,tempFlist)
-plt3.plot(timeMlist,humidList)
-plt3.xlabel("Time in Milliseconds")
-plt3.ylabel("atmo")
-plt3.show()
+##plt3.plot(timeMlist,pressurelist)
+#plt3.plot(timeMlist,tempFlist)
+#plt3.plot(timeMlist,humidList)
+#plt3.xlabel("Time in Milliseconds")
+#plt3.ylabel("atmo")
+#plt3.show()
 
 
-plt4.scatter(xarray1,npaltarray,c='red',alpha = .2)
-plt4.plot(xvar, y_predicted1, c="black")
+
+plt4.plot(time1000,Alt1000, c="red")
 plt4.title("Altitude over Time")
 plt4.xlabel("Time in Milliseconds")
-plt4.ylabel("Altitude")
+plt4.ylabel("Altitude Ft.")
 plt4.show()
 
-#plt5.plot(timeMlist,orientx)
-#plt5.plot(timeMlist,magnety)
-#plt5.plot(timeMlist,magnetz)
-#plt5.xlabel("Time in Milliseconds")
-#plt5.ylabel("oreintx")
-#plt5.show()
+plt5.plot(timeMlist,orientx)
+plt5.plot(timeMlist,orienty)
+plt5.plot(timeMlist,orientz)
+plt5.xlabel("Time in Milliseconds")
+plt5.ylabel("Oreintx")
+plt5.show()
 
 
 #-------------------------------------------------------------------------------------------------
