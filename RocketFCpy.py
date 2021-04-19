@@ -47,10 +47,10 @@ npaltarray = []
 #for x in range(len(ALTlist)):
 #    if ALTlist[x] < -200:
 #        ALTlist[x] = 0
-for each in range(len(ALTlist)):
-    xarray1.append(float(ALTlist[each]))
-for each in range(len(ALTlist)):
-    npaltarray.append(float(timeMlist[each]))    
+#for each in range(len(ALTlist)):
+#    xarray1.append(float(ALTlist[each]))
+#for each in range(len(ALTlist)):
+#    npaltarray.append(float(timeMlist[each]))    
 
 nums = []
 for number in gx:
@@ -145,9 +145,11 @@ gy1000 = removeDataPost(gy, 700)
 gy1000 = removeDataPre(gy1000, 550)
 gz1000 = removeDataPost(gz, 700)
 gz1000 = removeDataPre(gz1000, 550)
-
 Alt1000 = removeDataPost(ALTlist, 700)
 Alt1000 = removeDataPre(Alt1000, 550)
+heading1000 = removeDataPost(heading, 700)
+heading1000 = removeDataPre(heading1000, 550)
+
 
 #y =  time1000[-1]
 #npaltarray = np.array(ALTlist)
@@ -168,6 +170,7 @@ print(getApogee(ALTlist), "feet")
 print(getAvgHumidity(humidList), "% Average Humidity")
 print(getTempF(tempFlist))
 
+
 plt.scatter(time1000,gx1000, c='blue',alpha = .8)
 plt.plot(time1000,gx1000, c='blue',alpha = .8)
 plt.plot(time1000,gy1000, c='red',alpha = .8)
@@ -179,17 +182,17 @@ plt.ylabel("G")
 plt.show()
 #
 
-plt2.plot(timeMlist,heading)
+plt2.plot(time1000,heading1000)
 plt2.xlabel("Time in Milliseconds")
 plt2.ylabel("Heading")
 plt2.show()
 #
-##plt3.plot(timeMlist,pressurelist)
-#plt3.plot(timeMlist,tempFlist)
-#plt3.plot(timeMlist,humidList)
-#plt3.xlabel("Time in Milliseconds")
-#plt3.ylabel("atmo")
-#plt3.show()
+#plt3.plot(timeMlist,pressurelist)
+plt3.plot(timeMlist,tempFlist)
+plt3.plot(timeMlist,humidList)
+plt3.xlabel("Time in Milliseconds")
+plt3.ylabel("atmo")
+plt3.show()
 
 
 
